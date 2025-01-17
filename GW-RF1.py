@@ -26,17 +26,18 @@ def mean_absolute_percentage_error(y_true, y_pred):
     return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
 
 
-# 定义加权方式
+# 定义加权方式，在这里更改带宽
 def calculate_weights(data, point, bandwidth=3948.6925):
     weights = []
     # 遍历数据集中的每个点
     for _, row in data.iterrows():
         # 计算当前点与给定点的地理距离（米）
         distance = geodesic((row['latitude'], row['longitude']), point).meters
+        #这里超过2倍带宽的被定义为0，如果带宽较大可考虑更改为一倍带宽
         if distance > 2 * bandwidth:
             weight = 0
         else:
-        # 计算权重
+        # 计算权重，这里使用高斯核加权，根据需要更改
             weight = np.exp(-np.square(distance) / (2 * np.square(bandwidth)))
         weights.append(weight)
 
@@ -84,6 +85,7 @@ def main_process(data, X_train, X_train_m, y_train, X_gwrf, X, y, feature_names,
 
     with Pool(cpu_count()) as pool:
         tasks = []
+        #注意这里只计算50行，防止崩溃后无法保存
         for i in range(5):
             for index, row in data.iterrows():
                 if i * 10 + group <= index <= i * 10 + 9 + group:
@@ -124,5 +126,5 @@ if __name__ == '__main__':
     X_train_m = X_train.drop(columns=dis_to_drop)
     X_test_m = X_test.drop(columns=dis_to_drop)
 
-    # 运行主进程
+    # 运行主进程，示例代码只运行前50行，通过更改group值选择运行的行数
     main_process(data, X_train, X_train_m, y_train, X_gwrf, X, y, feature_names, group=0)
