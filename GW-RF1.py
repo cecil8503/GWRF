@@ -64,16 +64,15 @@ def calculate_weights(data, point, bandwidth=3948.6925):
     # 按照距离排序，获取最近的100个点的索引
     #sorted_indices = np.argsort(distances)[:num_neighbors]
 
-    # 计算周围最近33个点的数量（这里我们直接使用数量作为权重）
     #for _, row in data.iterrows():
         #point_coordinates = np.array([row['latitude'], row['longitude']])
         #distance = np.linalg.norm(point_coordinates - np.array(point))
 
         #if distance in distances[sorted_indices]:
-            # 如果距离属于最近33个点之一，权重为1（或者你可以根据需要进行更复杂的计算）
+            # 如果距离属于最近100个点之一，权重为1（或者你可以根据需要进行更复杂的计算）
             #weight = 1
         #else:
-            # 如果不在最近33个点中，权重为0
+            # 如果不在最近100个点中，权重为0
             #weight = 0
         
         #weights.append(weight)
