@@ -27,12 +27,16 @@ def mean_absolute_percentage_error(y_true, y_pred):
 
 
 # 定义加权方式，在这里更改带宽
+# 如果使用的是均匀格网，或希望用长度衡量带宽，使用这段代码：
 def calculate_weights(data, point, bandwidth=3948.6925):
     weights = []
     # 遍历数据集中的每个点
     for _, row in data.iterrows():
-        # 计算当前点与给定点的地理距离（米）
+        # 计算当前点与给定点的地理距离（米），如果坐标单位是经纬度十进制
         distance = geodesic((row['latitude'], row['longitude']), point).meters
+        #如果坐标单位是米，使用下面的距离计算方式：
+        #point_coordinates = np.array([row['latitude'], row['longitude']])  # 坐标已经是米为单位
+        #distance = np.linalg.norm(point_coordinates - np.array(point))  # 计算欧氏距离，单位是米
         #这里超过2倍带宽的被定义为0，如果带宽较大可考虑更改为一倍带宽
         if distance > 2 * bandwidth:
             weight = 0
@@ -42,6 +46,43 @@ def calculate_weights(data, point, bandwidth=3948.6925):
         weights.append(weight)
 
     return np.array(weights)
+
+#如果数据是不均匀格网，那么使用最近的若干各要素作为带宽会更合适，这里假设带宽是100
+#def calculate_weights(data, point, num_neighbors=100):
+    #weights = []
+
+    # 创建一个列表存储所有点与目标点之间的距离
+    #distances = []
+
+    # 遍历数据集中的每个点
+    #for _, row in data.iterrows():
+        #距离按照之前的计算
+        #point_coordinates = np.array([row['latitude'], row['longitude']])  # 坐标已经是米为单位
+        #distance = np.linalg.norm(point_coordinates - np.array(point))  # 计算欧氏距离，单位是米
+        #distances.append(distance)
+
+    # 按照距离排序，获取最近的100个点的索引
+    #sorted_indices = np.argsort(distances)[:num_neighbors]
+
+    # 计算周围最近33个点的数量（这里我们直接使用数量作为权重）
+    #for _, row in data.iterrows():
+        #point_coordinates = np.array([row['latitude'], row['longitude']])
+        #distance = np.linalg.norm(point_coordinates - np.array(point))
+
+        #if distance in distances[sorted_indices]:
+            # 如果距离属于最近33个点之一，权重为1（或者你可以根据需要进行更复杂的计算）
+            #weight = 1
+        #else:
+            # 如果不在最近33个点中，权重为0
+            #weight = 0
+        
+        #weights.append(weight)
+
+    #return np.array(weights)
+
+
+
+
 
 
 # 单个任务的处理函数
